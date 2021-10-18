@@ -4,7 +4,7 @@
 ---
 
 ### Timeline
-- Run Basic flask app in docker image
+- Run Basic flask app in docker image -- DONE
 - Make REST API for backend with flask-restful
 - Create Swagger UI
 - Create Minimal Front-End
