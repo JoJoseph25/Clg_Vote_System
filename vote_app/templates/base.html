@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}{% endblock %}</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% block styles %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        {% endblock %}
+
+    </head>
+    <body>
+
+        <div class="header-container">
+            <header class="wrapper clearfix">
+                <a href="{{ url_for('index') }}"><h1 class="title">Vote Sys</h1></a>
+            </header>
+        </div>
+
+        <div class="main-container">
+            <div class="main wrapper clearfix">
+                <article class="flashes">
+                    {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                        <ul>
+                        {% for message in messages %}
+                          <li>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                      {% endif %}
+                    {% endwith %}
+                </article>
+
+                {%  block content %}
+                {%  endblock %}
+
+            </div> <!-- #main -->
+        </div> <!-- #main-container -->
+
+        <div class="footer-container">
+            <footer class="wrapper">
+                <p>Vote System</p>
+            </footer>
+        </div>
+        
+        
+        
+        {% block scripts %}
+        {% endblock %}
+    </body>
+</html>

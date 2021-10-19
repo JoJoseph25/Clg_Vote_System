@@ -1,25 +1,37 @@
 from vote_app import db
 
+from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 
-class User(db.Model):
+class UserModel(db.Model):
 	__tablename__ = 'users'
 
-	id = db.Column(db.Integer, primary_key=True)
-	roll_num = db.Column(db.Integer(8), nullable=False, unique=True)
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+	roll_num = db.Column(db.Integer, nullable=False, unique=True)
 	name = db.Column(db.String(80),nullable=False)
 	email = db.Column(db.String(120), nullable=False, unique=True)
-	password_hash = db.Column(db.String, nullable=False)
-	admin =  db.Column(db.Boolean(),default=False)
+	_password = db.Column(db.String(), nullable=False)
+	admin =  db.Column(db.Integer,default=0)
  
-	def __init__(self, id, roll_num,name,email,password_hash,admin):
-		id = id
-		roll_num = roll_num
-		name = name
-		email = email
-		password_hash = password_hash
-		admin =  admin
 
+	@hybrid_property
+	def password(self):
+		raise self._password
+
+	@password.setter
+	def password(self, password_plain):
+		self._password = generate_password_hash(password_plain)
+	
+	def check_password(self, password_plain):
+		return check_password_hash(self._password, password_plain)
+
+	def __init__(self, roll_num,name,password,email,admin=0):
+		self.roll_num = roll_num
+		self.name = name
+		self.email = email
+		self.password = password
+		self.admin = admin
+	
 	def json(self):
 		output={
 			'id': self.id,
@@ -30,13 +42,14 @@ class User(db.Model):
 		}
 		return output
 
-	@property
-	def password(self):
-		raise AttributeError('password: write-only field')
+	def db_write(self):
+		db.session.add(self)
+		db.sesion.commit()
 
-	@password.setter
-	def password(self, password):
-		self.password_hash = generate_password_hash(password)
+	def db_pop(self):
+		db.session.delete(self)
+		db.sesion.commit()
 
-	def check_password(self, password):
-		return check_password_hash(self.password_hash, password)
+	@classmethod
+	def find_by_rollnum(cls, roll_num):
+		return cls.query.filter_by(roll_num=roll_num).first()

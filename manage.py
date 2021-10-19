@@ -1,9 +1,34 @@
-from flask import Flask
+from flask import Flask, render_template
 
-app = Flask(__name__)
+from vote_app import create_app
+from vote_app.runtime.commands import app_manager
+
+# ##Development Server
+app = create_app('dev')
+
+# ## Production Server
+# app = create_app('prod')
+
+# Start Manager
+# manager = Manager(app)
+
+# Create API
+
+# @app.before_first_request
+# def create_tables():
+#     db.create_all()
+
+
+
 
 @app.route('/')
 def index():
-    return "Hello World"
+    return render_template('index.html')
+
+
+
+
 if __name__=="__main__":
-    app.run(host='0.0.0.0',port=5000)
+    # Run the App manager commandline interface within application context
+    with app.app_context():
+        app_manager()

@@ -2,10 +2,10 @@ version: '3.4'
 
 services:
   vote_sys:
-    image: vote_sys
     build:
-      context: .
+      context: ./
       dockerfile: ./Dockerfile
+    container_name: vote_sys-template
+    restart: always
     ports:
       - 5000:5000
-    restart: always
