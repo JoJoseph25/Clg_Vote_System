@@ -203,15 +203,15 @@ class User(Resource):
 				output = {'message': 'User deleted.'}
 				return output, 200 # Status-OK
 			except:
-				output = {"message":"Something went wrong"}
+				output = {'message': 'Something went wrong'}
 				return output, 500 # Status-Internal Server Error
 		else:
-			output = {'message': 'Admin Acess required'}
+			output = {'message': 'Admin Access required'}
 			return output, 401 # Status-Unauthorized
 
 	# only used for update
 	@jwt_required()
-	def put(self, roll_num):
+	def put(self, roll_num: int):
 		"""
 		Updates User based on roll_num if present 
 		and current user has same roll_num.
@@ -220,7 +220,6 @@ class User(Resource):
 		data = _user_update_parse.parse_args()
 		
 		user_rollnum = get_jwt_identity()
-		print('JWT Identity: ',user_rollnum)
 		user = UserModel.find_by_rollnum(user_rollnum)
 
 		if user is None:
@@ -233,11 +232,10 @@ class User(Resource):
 		
 		# User present in Db
 		else: 
-			if data['name'] is not None: 
-				user.name = data['name']
-			elif data['password'] is not None:
-   				user.password = data['password']
-
+			for attr in data:
+				if data[attr] is not None: 
+					# Row, Column, New Value
+					setattr(user,attr,data[attr])
 		try:
 			user.db_write()
 			output = {'message': 'User data updated'}
