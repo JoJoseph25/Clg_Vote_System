@@ -9,18 +9,6 @@ app = create_app('dev')
 # ## Production Server
 # app = create_app('prod')
 
-# Start Manager
-# manager = Manager(app)
-
-# Create API
-
-# @app.before_first_request
-# def create_tables():
-#     db.create_all()
-
-
-
-
 @app.route('/')
 def index():
     return render_template('index.html')

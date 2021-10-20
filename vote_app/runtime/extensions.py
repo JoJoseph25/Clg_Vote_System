@@ -6,11 +6,14 @@ from flask_debugtoolbar import DebugToolbarExtension
 # Database
 db = SQLAlchemy()
 
+
 # Debug toolbar
 toolbar = DebugToolbarExtension()
+
+# create API
+api = Api()
 
 # JWT Manager
 jwt = JWTManager()
 
-# create API
-api = Api()
+

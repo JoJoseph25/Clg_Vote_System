@@ -34,6 +34,14 @@ class UserModel(db.Model):
 	
 	def json(self):
 		output={
+			'roll_num': self.roll_num,
+			'name': self.name,
+			'email': self.email,
+		}
+		return output
+	
+	def admin_json(self):
+		output={
 			'id': self.id,
 			'roll_num': self.roll_num,
 			'name': self.name,
@@ -44,12 +52,20 @@ class UserModel(db.Model):
 
 	def db_write(self):
 		db.session.add(self)
-		db.sesion.commit()
+		db.session.commit()
 
 	def db_pop(self):
 		db.session.delete(self)
-		db.sesion.commit()
+		db.session.commit()
 
 	@classmethod
 	def find_by_rollnum(cls, roll_num):
 		return cls.query.filter_by(roll_num=roll_num).first()
+
+	@classmethod
+	def find_by_email(cls, email):
+		return cls.query.filter_by(email=email).first()
+
+	@classmethod
+	def find_all(cls):
+		return cls.query.all()
