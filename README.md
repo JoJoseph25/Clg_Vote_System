@@ -6,7 +6,7 @@
 ### Timeline
 - Run Basic flask app in docker image -- DONE
 - Make REST API for backend with flask-restful -- DONE
-- Create Swagger UI
+- Create Swagger UI -- Partial Need to pass JWT acess token to do for other endpoints
 - Create Minimal Front-End
 - Add event-queue with celery redis
 - Create Queue View for Admin
