@@ -4,11 +4,7 @@ import redis
 import redis
 from flask import Flask
 from apispec import APISpec
-from marshmallow import Schema, fields
 from apispec.ext.marshmallow import MarshmallowPlugin
-from flask_apispec.extension import FlaskApiSpec
-from flask_apispec.views import MethodResource
-from flask_apispec import marshal_with, doc, use_kwargs
 
 from .runtime.extensions import db, toolbar, jwt, api, docs
 from .runtime.config import config_by_name
