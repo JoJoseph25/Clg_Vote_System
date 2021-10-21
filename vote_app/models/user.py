@@ -1,3 +1,4 @@
+from sqlalchemy.orm import backref
 from vote_app import db
 
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -12,7 +13,8 @@ class UserModel(db.Model):
 	email = db.Column(db.String(120), nullable=False, unique=True)
 	_password = db.Column(db.String(), nullable=False)
 	admin =  db.Column(db.Integer,default=0)
- 
+	votes = db.relationship('VotesModel', backref='voter', lazy=True)
+	
 
 	@hybrid_property
 	def password(self):
@@ -25,12 +27,12 @@ class UserModel(db.Model):
 	def check_password(self, password_plain):
 		return check_password_hash(self._password, password_plain)
 
-	def __init__(self, roll_num,name,password,email,admin=0):
-		self.roll_num = roll_num
-		self.name = name
-		self.email = email
-		self.password = password
-		self.admin = admin
+	# def __init__(self, roll_num,name,password,email,admin=0):
+	# 	self.roll_num = roll_num
+	# 	self.name = name
+	# 	self.email = email
+	# 	self.password = password
+	# 	self.admin = admin
 	
 	def json(self):
 		output={

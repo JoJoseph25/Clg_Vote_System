@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt
 
 
 from vote_app.models.candidate import CandidateModel
+from vote_app.models.votes import VotesModel
 
 
 _add_candidate_parse = reqparse.RequestParser()
@@ -96,27 +97,28 @@ class CandidateRegister(Resource):
 		# Check post valid
 
 		claims = get_jwt()
-		# If user is admin give ability to register
-		if claims['admin_access']==1:
-			try:
-				candidate = CandidateModel(roll_num=data['roll_num'], first_name=data['first_name'], last_name=data['last_name'],
-								batch=data['batch'], course=data['course'], department=data['department'],
-								post=data['post'],pic_path=data['pic_path'],agenda=data['agenda'])
-				candidate.db_write()
+		if len(claims)!=0:
+			# If user is admin give ability to register
+			if claims['admin_access']==1:
+				try:
+					candidate = CandidateModel(roll_num=data['roll_num'], first_name=data['first_name'], last_name=data['last_name'],
+									batch=data['batch'], course=data['course'], department=data['department'],
+									post=data['post'],pic_path=data['pic_path'],agenda=data['agenda'])
+					candidate.db_write()
 
-				output = {'message': 'Candidate Registered Sucessfully'}
-				return output, 200 # Status-OK
-			except:
-				output = {'message': 'Something went wrong'}
-				return output, 500 # Status-Internal Server Error
-		else:
-			output = {'message': 'Admin Access required'}
-			return output, 401 # Status-Unauthorized
+					output = {'message': 'Candidate Registered Sucessfully'}
+					return output, 200 # Status-OK
+				except:
+					output = {'message': 'Something went wrong'}
+					return output, 500 # Status-Internal Server Error
+	
+		output = {'message': 'Admin Access required'}
+		return output, 401 # Status-Unauthorized
 
 
 
 class Candidate(Resource):
-	def get(self, candidate_id):
+	def get(self, candidate_id: int):
 		"""
 		Fetches candidate info based on candidate_id
 		"""
@@ -132,29 +134,41 @@ class Candidate(Resource):
 	@jwt_required()
 	def delete(self, candidate_id: int):
 		"""
-		Deletes Candidate based on candidate_id but needs admin access
+		Deletes Candidate based on candidate_id but needs admin access.
+		Before Delete transfers all votes from candidate to No vote.
 		"""
 
 		candidate = CandidateModel.find_by_id(candidate_id)
-
-		claims = get_jwt()
 		
 		if candidate is None:
 			output = {'message': 'Candidate Not Found'}
 			return output, 404 # Status-Not Found
 
+		claims = get_jwt()
+		if len(claims)!=0:
 		# If user is admin give ability to delete
-		if claims['admin_access']==1:
-			try:
-				candidate.db_pop()
-				output = {'message': 'Candidate deleted.'}
-				return output, 200 # Status-OK
-			except:
-				output = {'message': 'Something went wrong'}
-				return output, 500 # Status-Internal Server Error
-		else:
-			output = {'message': 'Admin Access required'}
-			return output, 401 # Status-Unauthorized
+			if claims['admin_access']==1:
+				try:
+					# Transfer all votes from candidate to No Vote
+					null_candidate = CandidateModel.null_candidate(post=candidate.post)
+					votes = VotesModel.find_by_candidate(candidate=candidate.id, post=candidate.post)
+					for vote in votes:
+						if candidate.post==1:
+							vote.post_1 = null_candidate.id
+						elif candidate.post==2:
+							vote.post_2 = null_candidate.id
+					
+					#Remove candidate information
+					candidate.db_pop()
+					
+					output = {'message': 'Candidate deleted.'}
+					return output, 200 # Status-OK
+				except:
+					output = {'message': 'Something went wrong'}
+					return output, 500 # Status-Internal Server Error
+
+		output = {'message': 'Admin Access required'}
+		return output, 401 # Status-Unauthorized
 
 	@jwt_required()
 	def put(self, candidate_id: int):
@@ -166,35 +180,31 @@ class Candidate(Resource):
 		
 		data = _update_candidate_parse.parse_args()
 
-		claims = get_jwt()
 		candidate = CandidateModel.find_by_id(candidate_id)
 
 		if candidate is None:
 			output = {'message': 'Candidate not found'}
 			return output, 404 # Status-Not Found
 		
+		claims = get_jwt()
+		if len(claims)!=0:
 		# If user is admin give ability to delete
-		elif claims['admin_access']==1:
-			for attr in data:
-				if data[attr] is not None:
-					# Row, Column, New Value
-					setattr(candidate,attr, data[attr])
-			try:
-				candidate.db_write()
-				output = {'message': 'Candidate Data Updated'}
-				return output, 200 # Status-OK
-			except:
-				output = {'message': 'Something went wrong'}
-				return output, 500 # Status-Internal Server Error
-		else:
-			output = {'message': 'Admin Access required'}
-			return output, 500 # Status-Internal Server Error
+			if claims['admin_access']==1:
+				for attr in data:
+					if data[attr] is not None:
+						# Row, Column, New Value
+						setattr(candidate,attr, data[attr])
+				try:
+					candidate.db_write()
+					output = {'message': 'Candidate Data Updated'}
+					return output, 200 # Status-OK
+				except:
+					output = {'message': 'Something went wrong'}
+					return output, 500 # Status-Internal Server Error
+
+		output = {'message': 'Admin Access required'}
+		return output, 500 # Status-Internal Server Error
 			
-
-
-
-
-		pass
 
 
 

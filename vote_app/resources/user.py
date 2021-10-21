@@ -189,25 +189,25 @@ class User(Resource):
 		"""
 
 		user = UserModel.find_by_rollnum(roll_num)
-  
-		claims = get_jwt()
 		
 		if user is None:
 			output = {'message': 'User Not Found'}
 			return output, 404 # Status-Not Found
 
+		claims = get_jwt()
+		if len(claims)!=0:
 		# If user is admin give ability to delete
-		if claims['admin_access']==1:
-			try:
-				user.db_pop()
-				output = {'message': 'User deleted.'}
-				return output, 200 # Status-OK
-			except:
-				output = {'message': 'Something went wrong'}
-				return output, 500 # Status-Internal Server Error
-		else:
-			output = {'message': 'Admin Access required'}
-			return output, 401 # Status-Unauthorized
+			if claims['admin_access']==1:
+				try:
+					user.db_pop()
+					output = {'message': 'User deleted.'}
+					return output, 200 # Status-OK
+				except:
+					output = {'message': 'Something went wrong'}
+					return output, 500 # Status-Internal Server Error
+		
+		output = {'message': 'Admin Access required'}
+		return output, 401 # Status-Unauthorized
 
 	# only used for update
 	@jwt_required()
@@ -254,11 +254,11 @@ class UserList(Resource):
 		If logged in show roll_num,name,email of registered users,
 		If user has admin acess show everythin related to user except password.
 		"""
-		claims = get_jwt()
-		user_rollnum = get_jwt_identity()
 		
 		users = [user.json() for user in UserModel.find_all()]
 
+		claims = get_jwt()
+		user_rollnum = get_jwt_identity()
 		if user_rollnum:
 			# If user is admin show admin view
 			if claims['admin_access']==1:

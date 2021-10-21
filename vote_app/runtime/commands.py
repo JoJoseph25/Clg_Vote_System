@@ -70,6 +70,7 @@ def insert_data():
     Inserts Default User Values To SQL Database for Vote App
     '''
     db.create_all()
+    db.session.commit()
     
     # Add super admin and test user
     super_admin = UserModel(roll_num=17000000, name='admin', email="admin@gmail.com", password="pass", admin=1)

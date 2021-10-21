@@ -8,7 +8,7 @@ from .runtime.extensions import db, toolbar, jwt, api
 from .runtime.config import config_by_name
 from .resources.user import User, UserList, UserLogout, UserSingup, UserLogin, TokenRefresh
 from .resources.candidate import Candidate, CandidateRegister, CandidateList, Post, PostList
-
+from .resources.votes import Vote, VoteList, VoteCount
 
 
 def create_app(config_name):
@@ -99,5 +99,10 @@ def create_app(config_name):
 		api.add_resource(CandidateRegister,'/reg_candidate')
 		api.add_resource(CandidateList, '/candidates')
 
+		# Vote API
+		api.add_resource(Vote,'/vote')
+		api.add_resource(VoteList,'/votes')
+		api.add_resource(VoteCount,'/count')	
+		
 		api.init_app(app)
 	return app
