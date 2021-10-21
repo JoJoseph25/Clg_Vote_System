@@ -21,7 +21,6 @@ def create_app(config_name):
 	app = Flask(__name__)
 
 	with app.app_context():
-		# to make commnads work
   
 		app.config.from_object(config_by_name[config_name])
 		db.init_app(app)
@@ -117,13 +116,14 @@ def create_app(config_name):
 				title="Vote System",
 				version='v1',
 				plugins=[MarshmallowPlugin()],
-				openapi_version='3.0.0'
+				openapi_version='2.0.0'
 			),
 			'APISPEC_SWAGGER_URL': '/swagger/',  # URI to access API Doc JSON
 			'APISPEC_SWAGGER_UI_URL': '/swagger-ui/'  # URI to access UI of API Doc
 		})
 		
 		docs.init_app(app)
+		# docs.register(UserSignupSchema)
 		docs.register(UserSingup)
 
 	return app

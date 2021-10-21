@@ -1,6 +1,7 @@
-from flask import current_app
+from flask import current_app, request, jsonify
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate, ValidationError, EXCLUDE
+# from webargs import fields
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
 from flask_restful import Resource, reqparse
@@ -9,6 +10,20 @@ from flask_jwt_extended import create_access_token,create_refresh_token,get_jwt_
 
 from vote_app.runtime.config import Config
 from vote_app.models.user import UserModel
+
+
+class UserSignup_RequestSchema(Schema):
+	class Meta:
+		unknown = EXCLUDE
+
+	roll_num = fields.Integer(required=True, validate=validate.Range(min=10000000, max=99999999), description='Enter Roll Number')
+	name = fields.String(required=True, description='Enter your name')
+	email = fields.String(required=True, description='Enter your email')
+	password = fields.String(required=True, description='Enter the password', load_only=True)
+	admin = fields.Integer(required=False, validate=validate.Range(min=0,max=1), default=0, description='Admin Access leave')
+
+class UserSignup_ResponseSchema(Schema):
+	message = fields.Str()
 
 
 _user_parse = reqparse.RequestParser()
@@ -67,13 +82,35 @@ _login_parse.add_argument('password',
 
 class UserSingup(MethodResource,Resource):
 	@doc(description='This is User Signup Endpoint', tags=['User Endpoint'])
-	def post(self):
-		"""
-		If roll_num and email are not already registered by another user
-		register the user else return Bad Request and message
+	@use_kwargs(UserSignup_RequestSchema)
+	@marshal_with(UserSignup_ResponseSchema)
+	def post(self,**kwargs):
+		"""Gist detail view.
+		---
+		get:
+		parameters:
+		- in: path
+			schema: DemoParameter
+		responses:
+			200:
+			content:
+				application/json:
+				schema: DemoSchema
+			201:
+			content:
+				application/json:
+				schema: DemoSchema
 		"""
 
-		data = _user_parse.parse_args()
+		desc = "If roll_num and email are not already registered by another user register the user else return Bad Request and message"
+		try:
+			schema = UserSignup_RequestSchema()
+			data = schema.load(kwargs,unknown=EXCLUDE)
+			print(data)
+		except:
+			output = {"message":"Error loading Json body in request"}
+			return output, 400 #Status-Bad Request
+
 		
 		# Check Roll Num Unique
 		user = UserModel.find_by_rollnum(data['roll_num'])

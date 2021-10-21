@@ -18,7 +18,7 @@ class UserModel(db.Model):
 
 	@hybrid_property
 	def password(self):
-		raise self._password
+		return self._password
 
 	@password.setter
 	def password(self, password_plain):
