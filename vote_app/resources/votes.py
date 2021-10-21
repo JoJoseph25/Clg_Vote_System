@@ -1,4 +1,3 @@
-from datetime import timedelta
 from flask_jwt_extended.utils import get_jwt_identity
 
 from flask_restful import Resource, reqparse

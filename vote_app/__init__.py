@@ -3,8 +3,14 @@ import redis
 
 import redis
 from flask import Flask
+from apispec import APISpec
+from marshmallow import Schema, fields
+from apispec.ext.marshmallow import MarshmallowPlugin
+from flask_apispec.extension import FlaskApiSpec
+from flask_apispec.views import MethodResource
+from flask_apispec import marshal_with, doc, use_kwargs
 
-from .runtime.extensions import db, toolbar, jwt, api
+from .runtime.extensions import db, toolbar, jwt, api, docs
 from .runtime.config import config_by_name
 from .resources.user import User, UserList, UserLogout, UserSingup, UserLogin, TokenRefresh
 from .resources.candidate import Candidate, CandidateRegister, CandidateList, Post, PostList
@@ -105,4 +111,19 @@ def create_app(config_name):
 		api.add_resource(VoteCount,'/count')	
 		
 		api.init_app(app)
+
+		app.config.update({
+			'APISPEC_SPEC': APISpec(
+				title="Vote System",
+				version='v1',
+				plugins=[MarshmallowPlugin()],
+				openapi_version='3.0.0'
+			),
+			'APISPEC_SWAGGER_URL': '/swagger/',  # URI to access API Doc JSON
+			'APISPEC_SWAGGER_UI_URL': '/swagger-ui/'  # URI to access UI of API Doc
+		})
+		
+		docs.init_app(app)
+		docs.register(UserSingup)
+
 	return app

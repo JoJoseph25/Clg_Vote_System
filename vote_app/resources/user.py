@@ -1,8 +1,11 @@
-from datetime import timedelta
-
 from flask import current_app
+
+from marshmallow import Schema, fields
+from flask_apispec.views import MethodResource
+from flask_apispec import marshal_with, doc, use_kwargs
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import create_access_token,create_refresh_token,get_jwt_identity, jwt_required, get_jwt
+
 
 from vote_app.runtime.config import Config
 from vote_app.models.user import UserModel
@@ -62,7 +65,8 @@ _login_parse.add_argument('password',
 
 
 
-class UserSingup(Resource):
+class UserSingup(MethodResource,Resource):
+	@doc(description='This is User Signup Endpoint', tags=['User Endpoint'])
 	def post(self):
 		"""
 		If roll_num and email are not already registered by another user
