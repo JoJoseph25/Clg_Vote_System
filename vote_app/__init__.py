@@ -123,7 +123,12 @@ def create_app(config_name):
 		})
 		
 		docs.init_app(app)
-		# docs.register(UserSignupSchema)
 		docs.register(UserSingup)
+		docs.register(UserLogin)
+		docs.register(UserLogout)
+		docs.register(TokenRefresh)
+
+		docs.register(UserList)
+		docs.register(User)
 
 	return app

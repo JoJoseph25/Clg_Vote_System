@@ -1,6 +1,6 @@
 from flask import current_app, request, jsonify
 
-from marshmallow import Schema, fields, validate, ValidationError, EXCLUDE
+from marshmallow import Schema, fields, schema, validate, ValidationError, EXCLUDE
 # from webargs import fields
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
@@ -12,7 +12,12 @@ from vote_app.runtime.config import Config
 from vote_app.models.user import UserModel
 
 
-class UserSignup_RequestSchema(Schema):
+class Login_ResponseToken(Schema):
+	access_token = fields.String()
+	refresh_token = fields.String()
+
+
+class User_RequestSchema(Schema):
 	class Meta:
 		unknown = EXCLUDE
 
@@ -22,91 +27,33 @@ class UserSignup_RequestSchema(Schema):
 	password = fields.String(required=True, description='Enter the password', load_only=True)
 	admin = fields.Integer(required=False, validate=validate.Range(min=0,max=1), default=0, description='Admin Access leave')
 
-class UserSignup_ResponseSchema(Schema):
-	message = fields.Str()
+# class UserListSchema(Schema):
+# 	message = fields.String()
+# 	users = fields.List(fields.Nested(User_RequestSchema(exclude=("password",),many=True)))
 
-
-_user_parse = reqparse.RequestParser()
-_user_parse.add_argument('roll_num',
-						type=int,
-						required=True,
-						help="This field cannot be blank."
-						)
-_user_parse.add_argument('name',
-						type=str,
-						required=True,
-						help="This field cannot be blank."
-						)
-_user_parse.add_argument('email',
-						type=str,
-						required=True,
-						help="This field cannot be blank."
-						)
-_user_parse.add_argument('password',
-						type=str,
-						required=True,
-						help="This field cannot be blank."
-						)
-_user_parse.add_argument('admin',
-						type=int,
-						required=False
-						)
-
-
-_user_update_parse = reqparse.RequestParser()
-_user_update_parse.add_argument('name',
-						type=str,
-						required=False,
-						help="This field cannot be blank."
-						)
-_user_update_parse.add_argument('password',
-						type=str,
-						required=False,
-						help="This field cannot be blank."
-						)
-
-
-_login_parse = reqparse.RequestParser()
-_login_parse.add_argument('roll_num',
-						type=int,
-						required=True,
-						help="This field cannot be blank."
-						)
-_login_parse.add_argument('password',
-						type=str,
-						required=True,
-						help="This field cannot be blank."
-						)
+class Msg_ResponseSchema(Schema):
+	message = fields.String()
 
 
 
 class UserSingup(MethodResource,Resource):
 	@doc(description='This is User Signup Endpoint', tags=['User Endpoint'])
-	@use_kwargs(UserSignup_RequestSchema)
-	@marshal_with(UserSignup_ResponseSchema)
+	@use_kwargs(User_RequestSchema)
+	@marshal_with(Msg_ResponseSchema, code=200, description="Success | Returns: \nUser Registered Succesfully")
+	@marshal_with(Msg_ResponseSchema, code=400, description="Bad Request | Returns one of: \n \
+    																-Error loading Json body on request\n \
+    																-Email already redistered by another user\n \
+                        											-Roll_num already rigistered by another user")
+	@marshal_with(Msg_ResponseSchema, code=500, description="Internal Server Error | Returns: \n-Something went wrong")
 	def post(self,**kwargs):
-		"""Gist detail view.
-		---
-		get:
-		parameters:
-		- in: path
-			schema: DemoParameter
-		responses:
-			200:
-			content:
-				application/json:
-				schema: DemoSchema
-			201:
-			content:
-				application/json:
-				schema: DemoSchema
 		"""
-
-		desc = "If roll_num and email are not already registered by another user register the user else return Bad Request and message"
+		If roll_num and email are not already registered 
+		by another user register the user else 
+		return Bad Request and message"
+		"""
 		try:
-			schema = UserSignup_RequestSchema()
+			schema = User_RequestSchema()
 			data = schema.load(kwargs,unknown=EXCLUDE)
-			print(data)
 		except:
 			output = {"message":"Error loading Json body in request"}
 			return output, 400 #Status-Bad Request
@@ -136,15 +83,25 @@ class UserSingup(MethodResource,Resource):
 			
 
 
-class UserLogin(Resource):
-	def post(self):
+class UserLogin(MethodResource, Resource):
+	@doc(description='This is User Login Endpoint', tags=['User Endpoint'])
+	@use_kwargs(User_RequestSchema(exclude=("name", "email","admin")))
+	@marshal_with(Login_ResponseToken, code=200, description="Success | Returns: \nUser Registered Succesfully")
+	@marshal_with(Msg_ResponseSchema, code=401, description="Unauthorized | Returns: \n-Invalid User Credentials!")
+	@marshal_with(Msg_ResponseSchema, code=400, description="Bad Request | Returns: \n-Error loading Json body on request")
+	def post(self,**kwargs):
 		"""
 		If user roll_num and password correct create a new access and refresh token
 		else return invalid credentials 401 error
 		"""
 
-		data = _login_parse.parse_args()
-
+		try:
+			schema = User_RequestSchema(exclude=("name", "email","admin"))
+			data = schema.load(kwargs,unknown=EXCLUDE)
+		except:
+			output = {"message":"Error loading Json body in request"}
+			return output, 400 #Status-Bad Request
+			
 		user = UserModel.find_by_rollnum(data['roll_num'])
 
 		# User Present and password correct
@@ -164,7 +121,11 @@ class UserLogin(Resource):
 
 
 
-class UserLogout(Resource):
+class UserLogout(MethodResource, Resource):
+
+	@doc(description='This is User Logout Endpoint', tags=['User Endpoint'])
+	@marshal_with(Msg_ResponseSchema, code=200, description="Success | Returns: \nAccess token revoked")
+	@marshal_with(Msg_ResponseSchema, code=500, description="Internal Server Error | Returns: \n-Something went wrong")
 	@jwt_required()
 	def delete(self):
 		"""
@@ -175,9 +136,7 @@ class UserLogout(Resource):
 		jti = get_jwt()["jti"]
 		try:
 			current_app.jwt_redis_blocklist.set(jti, "", ex=Config.JWT_REVOKE_TOKEN_EXPIRES)
-			output = {'access_token': " ",
-					'refresh_token': " ",
-					'message':'Access token revoked'}
+			output = {'message':'Access token revoked'}
 			return output, 200 # Status-OK
 		except:
 			output = {"message":"Something went wrong"}
@@ -185,7 +144,10 @@ class UserLogout(Resource):
 
 
 
-class TokenRefresh(Resource):
+class TokenRefresh(MethodResource, Resource):
+
+	@doc(description='This is for refreshing access Token', tags=['User Endpoint'])
+	@marshal_with(Msg_ResponseSchema, code=200, description="Success | Returns: \nAccess token revoked")
 	@jwt_required(refresh=True)
 	def post(self):
 		"""
@@ -202,10 +164,12 @@ class TokenRefresh(Resource):
 
 
 
-class User(Resource):
-	
-	@classmethod
-	def get(cls, roll_num: int):
+class User(MethodResource, Resource):
+
+	@doc(description='This is for getting user details', tags=['User Endpoint'])
+	@marshal_with(User_RequestSchema, code=200, description="Success | Returns: \n-User Data")
+	@marshal_with(Msg_ResponseSchema, code=404, description="Not Found | Returns: \n-User Not found")
+	def get(self, roll_num: int):
 		"""
 		Returns user based on roll_num if it exist in DB
 		else returns status status not found
@@ -220,6 +184,11 @@ class User(Resource):
 		output = user.json() # get user data
 		return output, 200 # Status-OK
 
+	@doc(description='This is for removing user details Admin Access', tags=['User Endpoint'])
+	@marshal_with(Msg_ResponseSchema, code=200, description="Success | Returns: \n-User Deleted")
+	@marshal_with(Msg_ResponseSchema, code=401, description="Unauthorized | Returns: \n-Admin Access required")
+	@marshal_with(Msg_ResponseSchema, code=404, description="Not Found | Returns: \n-User Not found")
+	@marshal_with(Msg_ResponseSchema, code=500, description="Internal Server Error | Returns: \n-Something went wrong")
 	@jwt_required()
 	def delete(self, roll_num: int):
 		"""
@@ -251,14 +220,25 @@ class User(Resource):
 		return output, 401 # Status-Unauthorized
 
 	# only used for update
+	@doc(description='This is for removing user details Admin Access', tags=['User Endpoint'])
+	@use_kwargs(User_RequestSchema(exclude=("roll_num", "email","admin")))
+	@marshal_with(Msg_ResponseSchema, code=200, description="Success | Returns: \n-User data updated")
+	@marshal_with(Msg_ResponseSchema, code=401, description="Unauthorized | Returns: \n-Can only make changes to your data not other'")
+	@marshal_with(Msg_ResponseSchema, code=404, description="Not Found | Returns: \n-User Not found")
+	@marshal_with(Msg_ResponseSchema, code=500, description="Internal Server Error | Returns: \n-Something went wrong")
 	@jwt_required()
-	def put(self, roll_num: int):
+	def put(self, roll_num: int, **kwargs):
 		"""
 		Updates User based on roll_num if present 
 		and current user has same roll_num.
 		only updates name or password
 		"""
-		data = _user_update_parse.parse_args()
+		try:
+			schema = User_RequestSchema(exclude=("roll_num", "email","admin"))
+			data = schema.load(kwargs,unknown=EXCLUDE)
+		except:
+			output = {"message":"Error loading Json body in request"}
+			return output, 400 #Status-Bad Request
 		
 		user_rollnum = get_jwt_identity()
 		user = UserModel.find_by_rollnum(user_rollnum)
@@ -287,7 +267,14 @@ class User(Resource):
 
 
 
-class UserList(Resource):
+class UserList(MethodResource, Resource):
+
+	@doc(description='This is for getting all user data', tags=['User Endpoint'])
+	# @use_kwargs(User_RequestSchema(exclude=("roll_num", "email","admin")))
+	# @marshal_with(UserListSchema, code=200, description="Success | Returns: \n-User data updated")
+	# @marshal_with(Msg_ResponseSchema, code=401, description="Unauthorized | Returns: \n-Can only make changes to your data not other'")
+	# @marshal_with(Msg_ResponseSchema, code=404, description="Not Found | Returns: \n-User Not found")
+	# @marshal_with(Msg_ResponseSchema, code=500, description="Internal Server Error | Returns: \n-Something went wrong")
 	@jwt_required(optional=True)
 	def get(self):
 		"""
@@ -298,14 +285,19 @@ class UserList(Resource):
 		
 		users = [user.json() for user in UserModel.find_all()]
 
+		
 		claims = get_jwt()
 		user_rollnum = get_jwt_identity()
 		if user_rollnum:
+			message="Logged-in View"
 			# If user is admin show admin view
 			if claims['admin_access']==1:
+				message = "Admin-View"
 				users = [user.admin_json() for user in UserModel.find_all()]
+				# schema = User_RequestSchema(exclude=("password",))
 			# if user not admin use normal view
-			output = {'users': users}
+			output = {'users': users,
+            		'message': message}
 			return output, 200 # Status-OK
 	
 		else:
