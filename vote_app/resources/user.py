@@ -1,16 +1,23 @@
 from flask import current_app, request, jsonify
+from flask_jwt_extended.jwt_manager import JWTManager
 
 from marshmallow import Schema, fields, schema, validate, ValidationError, EXCLUDE
 # from webargs import fields
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, doc, use_kwargs
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import create_access_token,create_refresh_token,get_jwt_identity, jwt_required, get_jwt
+from flask_jwt_extended import (create_access_token,create_refresh_token,
+                                get_jwt_identity, jwt_required, get_jwt,  
+                                set_access_cookies, unset_jwt_cookies)
 
+import flask
+
+from vote_app.runtime.extensions import jwt
 
 from vote_app.runtime.config import Config
 from vote_app.models.user import UserModel
 
+from flask import current_app
 
 class Login_ResponseToken(Schema):
 	access_token = fields.String()
@@ -51,6 +58,7 @@ class UserSingup(MethodResource,Resource):
 		by another user register the user else 
 		return Bad Request and message"
 		"""
+		print('Recieved Here\n\n')
 		try:
 			schema = User_RequestSchema()
 			data = schema.load(kwargs,unknown=EXCLUDE)
@@ -107,13 +115,21 @@ class UserLogin(MethodResource, Resource):
 		# User Present and password correct
 		if user is not None and user.check_password(data['password']) and user.roll_num==data['roll_num']:
 			additional_claims = {"admin_access":user.admin}
-			access_token = create_access_token(identity=user.roll_num, additional_claims=additional_claims,fresh=True) 
+			access_token = create_access_token(identity={"roll_num": user.roll_num}, additional_claims=additional_claims,fresh=True) 
 			refresh_token = create_refresh_token(user.roll_num)
-			
+			try:
+				current_app.config["AUTHORIZATION"] = 'Bearer '+access_token
+				print("Access JWT")
+			except:
+				print("Unable to access JWT")
 			output = {
 				'access_token': access_token,
 				'refresh_token': refresh_token
 			}
+			flask.session['access_token'] = access_token
+			flask.session['refresh_token'] = refresh_token
+
+			# output={"message": "Login Success"}
 			return output, 200 # Status-OK
 		
 		output = {"message": "Invalid User Credentials!"}

@@ -5,12 +5,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = '~t\x86\xc9\x1ew\x8bOcX\x85O\xb6\xa2\x11kL\xd1\xce\x7f\x14<y\x9e'
-    JWT_SECRET_KEY = 'sdasdasd'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=2)
-    JWT_REVOKE_TOKEN_EXPIRES = timedelta(minutes=1)
+    JWT_SECRET_KEY = 'dasasdasdasd'
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=3)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=15)
     REDDIS_HOST = 'localhost'
     REDIS_PORT = 6379
     DEBUG = False
+    HTTP_AUTHORIZATION = ""
 
 
 class DevelopmentConfig(Config):

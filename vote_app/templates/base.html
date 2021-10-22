@@ -16,7 +16,16 @@
 
         <div class="header-container">
             <header class="wrapper clearfix">
-                <a href="{{ url_for('index') }}"><h1 class="title">Vote Sys</h1></a>
+                <a href="{{ url_for('home.index') }}"><h1 class="title">Vote Sys</h1></a>
+                <nav>
+                    <ul>
+                        <li><a href="/swagger-ui">Swagger UI</a></li>
+                        <li><a href="{{ url_for('candi.candidate_view') }}">Candidates</a></li>
+                        <li><a href="{{ url_for('auth.register') }}">Sign Up</a></li>
+                        <li><a href="{{ url_for('auth.user_login') }}">Login</a></li>
+                        <li><a href="{{ url_for('auth.user_logout') }}">Log out</a></li>
+                    </ul>
+                </nav>
             </header>
         </div>
 

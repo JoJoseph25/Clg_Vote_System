@@ -13,21 +13,8 @@ class CandidateModel(db.Model):
 	course = db.Column(db.Integer, nullable=False)
 	department = db.Column(db.Integer, nullable=False)
 	post = db.Column(db.Integer, nullable=False)
-	pic_path = db.Column(db.String(120), default='deafult/pic/path')
+	pic_path = db.Column(db.String(120), default='vote_app/ui_paths/candidates/images/00ccc0f6166ea9d0c36ef3f013813236.jpg')
 	agenda =  db.Column(db.String(300), default="No agenda")
-
-	# def __init__(self, roll_num,first_name,last_name,
-	# 			batch,course,department,
-	# 			post,pic_path='deafult/pic/path',agenda="No agenda"):
-	# 	self.roll_num = roll_num
-	# 	self.first_name = first_name
-	# 	self.last_name = last_name
-	# 	self.batch = batch
-	# 	self.course = course
-	# 	self.department = department
-	# 	self.post = post
-	# 	self.pic_path = pic_path
-	# 	self.agenda = agenda
 
 	def json(self):
 		output={

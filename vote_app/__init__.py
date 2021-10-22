@@ -5,6 +5,7 @@ import redis
 from flask import Flask
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
+from webargs.flaskparser import use_args, use_kwargs, parser, abort
 
 from .runtime.extensions import db, toolbar, jwt, api, docs
 from .runtime.config import config_by_name
@@ -12,6 +13,7 @@ from .resources.user import User, UserList, UserLogout, UserSingup, UserLogin, T
 from .resources.candidate import Candidate, CandidateRegister, CandidateList, Post, PostList
 from .resources.votes import Vote, VoteList, VoteCount
 
+from flask_jwt_extended import JWTManager
 
 def create_app(config_name):
 	app = Flask(__name__)
@@ -22,7 +24,8 @@ def create_app(config_name):
 		db.init_app(app)
 		toolbar.init_app(app)
 		
-		jwt.init_app(app)
+		# jwt.init_app(app)
+		JWTManager(app)
 		
 		# redis databse
 		# Setup our redis connection for storing the blocklisted tokens. You will probably
@@ -126,5 +129,25 @@ def create_app(config_name):
 
 		docs.register(UserList)
 		docs.register(User)
+
+		# This error handler is necessary for usage with Flask-RESTful
+		@parser.error_handler
+		def handle_request_parsing_error(err, req, schema, *, error_status_code, error_headers):
+			"""webargs error handler that uses Flask-RESTful's abort function to return
+			a JSON error response to the client.
+			"""
+			abort(error_status_code, errors=err.messages)
+		
+		# Blueprint For Different Home Views
+		from .ui_paths.home import home as home_blueprint
+		app.register_blueprint(home_blueprint, url_prefix='/')
+
+		# Blueprint For Different Authetication Views
+		from .ui_paths.auth import auth as auth_blueprint
+		app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+		# Blueprint For Different Candidate Views
+		from .ui_paths.candidates import candi as candi_blueprint
+		app.register_blueprint(candi_blueprint, url_prefix='/candi')
 
 	return app

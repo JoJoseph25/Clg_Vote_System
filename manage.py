@@ -9,9 +9,9 @@ app = create_app('dev')
 # ## Production Server
 # app = create_app('prod')
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
 
 
 

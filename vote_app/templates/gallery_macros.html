@@ -1,0 +1,14 @@
+{% macro render_candidate(candi) %}
+    <div class="item">
+        <img src=  {{ url_for('static',filename="images/00ccc0f6166ea9d0c36ef3f013813236.jpg")}} class="pic">
+        <div class="content">
+        <h3 id="name">Name: {{ candi['first_name'] }} {{ candi['last_name'] }}</h3>
+        <h2 id="rollno">Roll Number: {{ candi['roll_num'] }}</h2>
+        <br>
+        <div id="batch">Batch: {{ candi['batch'] }}</div>
+        <h2>Course: {{ candi['course'] }}</h2>
+        <h2>Department: {{ candi['department'] }}</h2>
+        <p id="agenda">Agenda: {{ candi['agenda'] }}</p>
+        </div>
+    </div>
+{% endmacro %}

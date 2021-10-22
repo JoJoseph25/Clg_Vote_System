@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "gallery_macros.html" import render_candidate %}
+
+{% block title %}
+Vote Sys -- Login
+{%  endblock %}
+
+{% block content %}
+	<section>
+		<h1>Post 1- President: </h1>
+		<br>
+		<div class="gallery">
+			{% for cur_candi in candidates_post_1 %}
+				{{ render_candidate(cur_candi) }}
+			{% endfor %}
+		</div>
+		<br>
+		<br>
+		<h1>Post-2 President: </h1>
+		<br>
+		<div class="gallery">
+			{% for cur_candi in candidates_post_2 %}
+				{{ render_candidate(cur_candi) }}
+			{% endfor %}
+		</div>
+	</section>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
