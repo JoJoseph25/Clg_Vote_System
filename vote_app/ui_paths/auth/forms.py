@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField, PasswordField, BooleanField, SubmitField, IntegerField
 from wtforms.validators import NumberRange, DataRequired, Length, Email, Regexp, EqualTo,\
-    ValidationError
+    ValidationError, Optional
 
 
 class LoginForm(FlaskForm):
@@ -27,6 +27,6 @@ class SignupForm(FlaskForm):
                         DataRequired(),
                         EqualTo('password2', message='Passwords must match.')])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
-    admin_code =IntegerField('Enter Admin Code (if known), else leave blank: ',)
+    admin_code =IntegerField('Enter Admin Code (if known), else leave blank: ',validators=[Optional()])
 
     submit = SubmitField('Register')

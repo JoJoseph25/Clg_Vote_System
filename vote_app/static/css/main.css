@@ -236,11 +236,6 @@ ul.bookmarks {
     padding: 1em 0;
 }
 
-a.header {
-    color: *#326786*;
-    text-decoration: none;
-    display: block;
-}
 
 a.header h3 {
     margin: 0 0;

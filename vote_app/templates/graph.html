@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Terrium -- Dashboard
+Voting -- Dashboard
 {%  endblock %}
 
 {% block styles %}
@@ -18,42 +18,58 @@ Terrium -- Dashboard
 {% block content %}
 
 
-<!-- Display Graph -->
+<!-- Display Graph Post1 Graph-->
 <article class="graph_display">
+  <p>
+  {% for roll_num in post1_labels %}
+    {{ roll_num }}: &nbsp;&nbsp;&nbsp;&nbsp; {{candidate_names[roll_num]}}
+    <br>
+  {% endfor %}
+  </p>
   <div class="chart-container" style="height: 500px; width: 500px">
-      <canvas id="myChart"></canvas>
+      <canvas id="Chart1"></canvas>
   </div>
 
 </article>
 
+
+<!-- Display Graph Post1 Graph-->
+<article class="graph_display">
+  <p>
+  {% for roll_num in post2_labels %}
+    {{ roll_num }}: &nbsp;&nbsp;&nbsp;&nbsp; {{candidate_names[roll_num]}}
+    <br>
+  {% endfor %}
+  </p>
+  <div class="chart-container" style="height: 500px; width: 500px">
+      <canvas id="Chart2"></canvas>
+  </div>
+
+</article>
+
+
 <script>
 
-  var timeFormat = 'DD/MM/YYYY HH:mm:ss';
-
-  function newDateString(days, months, years, hours, minutes, seconds) {
-  return moment().date(days).month(months-1).year(years).hour(hours).minute(minutes).second(seconds).format(timeFormat);
-  }
   
-
-  {% comment %} // define the chart data
+ // define the chart data
   var chartData = {
-    labels : [{% for item in labels %}
-                newDateString({{item.day}},{{item.month}},{{item.year}}, {{item.hour}},{{item.minute}},{{item.second}}),
+    labels : [{% for item in post1_labels %}
+                {{item}},
               {% endfor %}
              ],
     datasets : [{
         label: 'Votes',
-        data : [{% for d in data%}
-                  {{ d[fetch_str] }},
+        data : [{% for vote in post1_votes %}
+                  {{vote}},
                 {% endfor %}]
     }]
-  }
+  };
 
-  var ctx = document.getElementById("myChart").getContext("2d");
+  var ctx = document.getElementById("Chart1").getContext("2d");
 
 
   // create the chart using the chart canvas
-  var myChart = new Chart(ctx, {
+  var Chart1 = new Chart(ctx, {
     type: 'bar',
     data: chartData,
     options: {
@@ -63,11 +79,47 @@ Terrium -- Dashboard
 				}
 			}
 		},
-	}); {% endcomment %}
+	});
 
 
 </script>
 
+
+<script>
+
+  
+ // define the chart data
+  var chartData2 = {
+    labels : [{% for item in post2_labels %}
+                {{item}},
+              {% endfor %}
+             ],
+    datasets : [{
+        label: 'Votes',
+        data : [{% for vote in post2_votes %}
+                  {{vote}},
+                {% endfor %}]
+    }]
+  };
+
+  var ctx = document.getElementById("Chart2").getContext("2d");
+
+
+  // create the chart using the chart canvas
+  var Chart2 = new Chart(ctx, {
+    type: 'bar',
+    data: chartData2,
+    options: {
+      scales: {
+		  y:{
+			  begginAtZero: true
+				}
+			}
+		},
+	});
+
+
+</script>
 
 
 {% endblock %}
