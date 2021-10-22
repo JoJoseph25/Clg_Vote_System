@@ -9,8 +9,6 @@ from .forms import LoginForm, SignupForm
 # from ...resources.user import UserLogin
 
 
-from flask import current_app
-
 @auth.route("/user_login", methods=["GET", "POST"])
 def user_login():
     form = LoginForm()

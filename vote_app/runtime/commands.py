@@ -85,15 +85,15 @@ def insert_data():
     db.session.add(candidate0)
     candidate1 = CandidateModel(roll_num=17110011, first_name='Cristiano', last_name='Ronaldo', 
                                 batch=17, course=11, department=00, post=1, 
-                                agenda="Will try to win Champions League")
+                                pic_path='images/post_1_candi_1.png',agenda="Will try to win Champions League")
     db.session.add(candidate1)
     candidate2 = CandidateModel(roll_num=17315211, first_name='Robert', last_name='Lewandowski', 
                                 batch=17, course=31, department=15, post=1, 
-                                agenda="Will Score 40 goals a season")
+                                pic_path='images/post1_candi_2.png',agenda="Will Score 40 goals a season")
     db.session.add(candidate2)
     candidate3 = CandidateModel(roll_num=16225611, first_name='Zlatan', last_name='Ibrahimovic', 
                                 batch=16, course=22, department=56, post=1, 
-                                agenda="I'm Zlatan.")
+                                pic_path='images/post1_candi_3.png',agenda="I'm Zlatan.")
     db.session.add(candidate3)
     
     # POST 2
@@ -102,19 +102,19 @@ def insert_data():
     db.session.add(candidate0)
     candidate1 = CandidateModel(roll_num=20420031, first_name='Bruno', last_name='Fernandes', 
                                 batch=20, course=42, department=00, post=2, 
-                                agenda="I will assist Cristiano")
+                                pic_path='images/post_2_candi_1.png',agenda="I will assist Cristiano")
     db.session.add(candidate1)
     candidate2 = CandidateModel(roll_num=18315211, first_name='Harry', last_name='Kane', 
                                 batch=18, course=31, department=52, post=2, 
-                                agenda="I'm staying at Tottenham and will try to win the league")
+                                pic_path='images/post_2_candi_2.png',agenda="I'm staying at Tottenham and will try to win the league")
     db.session.add(candidate2)
     candidate3 = CandidateModel(roll_num=20225611, first_name='Megan', last_name='Rapinoe', 
                                 batch=20, course=22, department=56, post=2, 
-                                agenda="Equal pay for US Womens team")
+                                pic_path='images/post_2_candi_3.png',agenda="Equal pay for US Womens team")
     db.session.add(candidate3)
     candidate4 = CandidateModel(roll_num=18312411, first_name='Lionel', last_name='Messi', 
                                 batch=18, course=31, department=24, post=2, 
-                                agenda="Equal pay for US Womens team")
+                                pic_path='images/post_2_candi_4.png',agenda="Equal pay for US Womens team")
     db.session.add(candidate4)
     
     db.session.commit()

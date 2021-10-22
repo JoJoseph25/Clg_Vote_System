@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "form_macros.html" import render_field %}
+
+{% block title %}
+Vote Sys -- Login
+{%  endblock %}
+
+{% block content %}
+    <section>
+        <h1 style="clear: both">Please login</h1>
+        <form action="" method="post">
+            {{form.hidden_tag()}}
+            <table>
+                {{ render_field(form.post1_choice) }}
+                {{ render_field(form.post2_choice) }}
+                {{ render_field(form.submit_button) }}
+            </table>
+        </form>
+    </section>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

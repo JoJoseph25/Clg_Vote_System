@@ -527,8 +527,8 @@ div.select2-container {
 }
 
 .gallery .item .pic{
-    max-width: 20vw;
-    /* max-height: */
+    max-width: 20vw; 
+    /* max-height: 50vw; */
 }
 
 .gallery .item .content{

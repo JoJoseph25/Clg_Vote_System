@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}
+Terrium -- Dashboard
+{%  endblock %}
+
+{% block styles %}
+{{ super() }}
+
+<script src="https://cdn.jsdelivr.net/momentjs/2.9.0/moment.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.bundle.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+
+<!-- Display Graph -->
+<article class="graph_display">
+  <div class="chart-container" style="height: 500px; width: 500px">
+      <canvas id="myChart"></canvas>
+  </div>
+
+</article>
+
+<script>
+
+  var timeFormat = 'DD/MM/YYYY HH:mm:ss';
+
+  function newDateString(days, months, years, hours, minutes, seconds) {
+  return moment().date(days).month(months-1).year(years).hour(hours).minute(minutes).second(seconds).format(timeFormat);
+  }
+  
+
+  {% comment %} // define the chart data
+  var chartData = {
+    labels : [{% for item in labels %}
+                newDateString({{item.day}},{{item.month}},{{item.year}}, {{item.hour}},{{item.minute}},{{item.second}}),
+              {% endfor %}
+             ],
+    datasets : [{
+        label: 'Votes',
+        data : [{% for d in data%}
+                  {{ d[fetch_str] }},
+                {% endfor %}]
+    }]
+  }
+
+  var ctx = document.getElementById("myChart").getContext("2d");
+
+
+  // create the chart using the chart canvas
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: chartData,
+    options: {
+      scales: {
+		  y:{
+			  begginAtZero: true
+				}
+			}
+		},
+	}); {% endcomment %}
+
+
+</script>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{% endblock %}
+
+
+{% block sidebar %}
+{% endblock %}

@@ -10,11 +10,11 @@ class VotesModel(db.Model):
 	post_1 = db.Column(db.Integer, nullable=False, default=1)
 	post_2 = db.Column(db.Integer, nullable=False, default=1)
  
-	# def __init__(self, roll_num, voter_id, post_1, post_2):
-	# 	self.roll_num = roll_num
-	# 	self.post_1 = post_1
-	# 	self.post_2 = post_2
-	# 	self.voter_id = voter_id
+	def __init__(self, roll_num, voter_id, post_1, post_2):
+		self.roll_num = roll_num
+		self.post_1 = post_1
+		self.post_2 = post_2
+		self.voter_id = voter_id
 
 	def db_write(self):
 		db.session.add(self)

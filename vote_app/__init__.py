@@ -122,13 +122,23 @@ def create_app(config_name):
 		})
 		
 		docs.init_app(app)
+  
 		docs.register(UserSingup)
 		docs.register(UserLogin)
 		docs.register(UserLogout)
 		docs.register(TokenRefresh)
-
 		docs.register(UserList)
 		docs.register(User)
+
+		docs.register(Post)
+		docs.register(PostList)
+		docs.register(Candidate)
+		docs.register(CandidateRegister)
+		docs.register(CandidateList)
+
+		docs.register(Vote)
+		docs.register(VoteList)
+		docs.register(VoteCount)
 
 		# This error handler is necessary for usage with Flask-RESTful
 		@parser.error_handler
@@ -149,5 +159,13 @@ def create_app(config_name):
 		# Blueprint For Different Candidate Views
 		from .ui_paths.candidates import candi as candi_blueprint
 		app.register_blueprint(candi_blueprint, url_prefix='/candi')
+
+		# Blueprint For Different Vote Views
+		from .ui_paths.choose import choose as choose_blueprint
+		app.register_blueprint(choose_blueprint, url_prefix='/choose')
+
+		# Blueprint For Different Graph Views
+		from .ui_paths.graph import graph as graph_blueprint
+		app.register_blueprint(graph_blueprint, url_prefix='/graph')
 
 	return app

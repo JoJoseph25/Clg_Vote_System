@@ -1,6 +1,6 @@
 {% macro render_candidate(candi) %}
     <div class="item">
-        <img src=  {{ url_for('static',filename="images/00ccc0f6166ea9d0c36ef3f013813236.jpg")}} class="pic">
+        <img src=  {{ url_for('static',filename=candi['pic_path'])}} class="pic">
         <div class="content">
         <h3 id="name">Name: {{ candi['first_name'] }} {{ candi['last_name'] }}</h3>
         <h2 id="rollno">Roll Number: {{ candi['roll_num'] }}</h2>

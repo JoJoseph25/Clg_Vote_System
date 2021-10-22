@@ -3,6 +3,10 @@ from flask_jwt_extended.utils import get_jwt_identity
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
+from marshmallow import Schema, fields, schema, validate, ValidationError, EXCLUDE
+# from webargs import fields
+from flask_apispec.views import MethodResource
+
 from vote_app.models.user import UserModel
 from vote_app.models.votes import VotesModel
 from vote_app.resources.candidate import CandidateModel
@@ -34,14 +38,15 @@ _vote_count_parse.add_argument('method_id',
 
 
 
-class Vote(Resource):
+class Vote(MethodResource, Resource):
 	@jwt_required(optional=True)
 	def get(self):
 		"""
 		Fetch vote of the current user.
 		If not logged in return msg to vote.
 		"""
-		user_rollnum = get_jwt_identity()
+		user= get_jwt_identity()
+		user_rollnum = user['roll_num']
 		
 		if user_rollnum is not None:
 			voted = VotesModel.find_by_rollnum(user_rollnum)
@@ -63,7 +68,8 @@ class Vote(Resource):
 
 		data  = _vote_parse.parse_args()
 
-		user_rollnum = get_jwt_identity()
+		user= get_jwt_identity()
+		user_rollnum = user['roll_num']
 		
 		voted = VotesModel.find_by_rollnum(user_rollnum)
 
@@ -87,7 +93,7 @@ class Vote(Resource):
 
 
 
-class VoteList(Resource):
+class VoteList(MethodResource, Resource):
 	
 	@jwt_required(optional=True)
 	def get(self):
@@ -111,7 +117,7 @@ class VoteList(Resource):
 
 
 
-class VoteCount(Resource):
+class VoteCount(MethodResource, Resource):
 	def get(self):
 		"""
 		Returns the count of votes based on the count method.

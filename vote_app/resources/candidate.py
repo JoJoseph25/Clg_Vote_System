@@ -1,6 +1,9 @@
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt
 
+from marshmallow import Schema, fields, schema, validate, ValidationError, EXCLUDE
+# from webargs import fields
+from flask_apispec.views import MethodResource
 
 from vote_app.models.candidate import CandidateModel
 from vote_app.models.votes import VotesModel
@@ -77,7 +80,7 @@ _update_candidate_parse.add_argument('agenda',
 
 
 
-class CandidateRegister(Resource):
+class CandidateRegister(MethodResource, Resource):
 	@jwt_required()
 	def post(self):
 		"""
@@ -115,7 +118,7 @@ class CandidateRegister(Resource):
 
 
 
-class Candidate(Resource):
+class Candidate(MethodResource, Resource):
 	def get(self, candidate_id: int):
 		"""
 		Fetches candidate info based on candidate_id
@@ -206,7 +209,7 @@ class Candidate(Resource):
 
 
 
-class CandidateList(Resource):
+class CandidateList(MethodResource, Resource):
 	def get(self):
 		"""
 		Get list of information regarding all candidates irrespective of post 
@@ -219,7 +222,7 @@ class CandidateList(Resource):
 
 
 
-class Post(Resource):
+class Post(MethodResource, Resource):
 	def get(self,post_num):
 		"""
 		Returns candidates based on post id
@@ -238,7 +241,7 @@ class Post(Resource):
 
 
 
-class PostList(Resource):
+class PostList(MethodResource, Resource):
 	def get(self):
 		"""
 		Get list of information posts with candidates nested by post

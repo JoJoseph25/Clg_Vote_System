@@ -13,7 +13,7 @@ class CandidateModel(db.Model):
 	course = db.Column(db.Integer, nullable=False)
 	department = db.Column(db.Integer, nullable=False)
 	post = db.Column(db.Integer, nullable=False)
-	pic_path = db.Column(db.String(120), default='vote_app/ui_paths/candidates/images/00ccc0f6166ea9d0c36ef3f013813236.jpg')
+	pic_path = db.Column(db.String(120), default='images/default.png')
 	agenda =  db.Column(db.String(300), default="No agenda")
 
 	def json(self):

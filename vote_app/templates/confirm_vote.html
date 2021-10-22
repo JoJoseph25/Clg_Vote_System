@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "form_macros.html" import render_field %}
+
+{% block title %}
+Vote Sys -- Login
+{%  endblock %}
+
+{% block content %}
+    <section>
+        <h1 style="clear: both">Are you sure of your vote?</h1>
+        <form role="form" method='POST' action="">
+            <button type="submit" name="confirm" value=1 class="btn btn-primary">YES</button>
+            <button type="submit" name="confirm" value=0 class="btn btn-primary">No</button>
+        </form>
+    </section>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
